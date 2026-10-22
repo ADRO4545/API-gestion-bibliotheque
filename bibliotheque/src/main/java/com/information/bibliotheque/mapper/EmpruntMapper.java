@@ -3,6 +3,7 @@ package com.information.bibliotheque.mapper;
 import com.information.bibliotheque.model.Emprunt;
 import com.information.bibliotheque.dto.EmpruntRequest;
 import com.information.bibliotheque.dto.EmpruntResponse;
+import java.time.LocalDate;
 
 public class EmpruntMapper {
 
@@ -21,6 +22,7 @@ public class EmpruntMapper {
      * Convertit une entité JPA en DTO de réponse.
      */
     public static EmpruntResponse versResponse(EmpruntResponse emprunt) {
+        boolean enRetard = emprunt.getDateRetourPrevue().isBefore(LocalDate.now());
         return new EmpruntResponse(
                 emprunt.getId(),
                 emprunt.getLivreId(),
@@ -29,7 +31,7 @@ public class EmpruntMapper {
                 emprunt.getDateRetourPrevue(),
                 emprunt.getDateRetourEffective(),
                 emprunt.getRendu(),
-                emprunt.getEnRetard());
+                enRetard);
     }
 
 }

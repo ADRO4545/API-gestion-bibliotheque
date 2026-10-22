@@ -1,7 +1,10 @@
 package com.information.bibliotheque.dto;
 
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({ "id", "livreId", "emprunteur", "dateEmprunt", "dateRetourPrevue",
+        "dateRetourEffective", "rendu", "enRetard" })
 public class EmpruntResponse {
     private Long id;
     private Long livreId;
