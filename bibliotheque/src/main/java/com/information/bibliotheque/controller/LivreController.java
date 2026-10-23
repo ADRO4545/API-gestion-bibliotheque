@@ -6,7 +6,9 @@ import com.information.bibliotheque.mapper.LivreMapper;
 import com.information.bibliotheque.model.Livre;
 import com.information.bibliotheque.service.LivreService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-
 @RestController
 @RequestMapping("/api/v1/livres")
 public class LivreController {
+
     private final LivreService livreService;
 
     public LivreController(LivreService livreService) {
@@ -34,63 +36,85 @@ public class LivreController {
     }
 
     @GetMapping
-    public PagedModel<LivreResponse> findAll(Pageable pageable) {
-        return LivreMapper.versPage(livreService.findAll(pageable));
+    public ResponseEntity<PagedModel<LivreResponse>> listerTous(
+            @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
+        Page<Livre> page = livreService.recupererTous(pageable);
+        return ResponseEntity.ok(LivreMapper.versPage(page));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LivreResponse> findById(@PathVariable Long id) {
-        return livreService.findById(id)
-                .map(livre -> ResponseEntity.ok(LivreMapper.versResponse(livre))) // 200 OK si trouvé
-                .orElse(ResponseEntity.notFound().build()); // 404 si non trouvé
-    }
-
-    @GetMapping("/recherche")
-    public PagedModel<LivreResponse> rechercherParTitre(@RequestParam String titre, Pageable pageable) {
-        return LivreMapper.versPage(livreService.rechercherParTitre(titre, pageable));
-    }
-
-    @GetMapping("/disponibles")
-    public PagedModel<LivreResponse> recupererDisponibles(Pageable pageable) {
-        return LivreMapper.versPage(livreService.recupererDisponibles(pageable));
+    public ResponseEntity<LivreResponse> obtenirParId(@PathVariable Long id) {
+        Optional<Livre> resultat = livreService.recupererParId(id);
+        if (resultat.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(LivreMapper.versResponse(resultat.get()));
     }
 
     @PostMapping
-    public ResponseEntity<LivreResponse> creer(@Valid @RequestBody LivreRequest livreRequest) {
-        if (livreService.isbnExiste(livreRequest.getIsbn())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 si ISBN déjà pris
+    public ResponseEntity<LivreResponse> creer(@Valid @RequestBody LivreRequest request) {
+        if (!livreService.auteurExiste(request.getAuteurId())) {
+            return ResponseEntity.badRequest().build();
         }
-        Livre livre = livreService.creer(LivreMapper.versEntite(livreRequest));
-        return ResponseEntity.status(HttpStatus.CREATED).body(LivreMapper.versResponse(livre)); // 201
+        if (livreService.isbnExiste(request.getIsbn())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Livre livre = livreService.creer(LivreMapper.versEntite(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(LivreMapper.versResponse(livre));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LivreResponse> mettreAJour(@PathVariable Long id, @Valid @RequestBody LivreRequest livreRequest) {
-        Optional<Livre> livreExistant = livreService.findById(id);
-        if (livreExistant.isEmpty()) {
-            return ResponseEntity.notFound().build(); // 404
+    public ResponseEntity<LivreResponse> mettreAJour(@PathVariable Long id,
+                                                     @Valid @RequestBody LivreRequest request) {
+        Optional<Livre> resultat = livreService.recupererParId(id);
+        if (resultat.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        if (livreService.isbnUtiliseParUnAutreLivre(livreRequest.getIsbn(), id)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409
+        if (!livreService.auteurExiste(request.getAuteurId())) {
+            return ResponseEntity.badRequest().build();
         }
-        Livre livre = livreService.mettreAJour(livreExistant.get(), LivreMapper.versEntite(livreRequest));
-        return ResponseEntity.ok(LivreMapper.versResponse(livre)); // 200
-    }
-
-    @PatchMapping("/{id}/stock")
-    public ResponseEntity<LivreResponse> ajouterStock(@PathVariable Long id, @RequestParam Integer quantite) {
-        return livreService.findById(id)
-                .map(livre -> ResponseEntity.ok(LivreMapper.versResponse(livreService.ajouterStock(livre, quantite))))
-                .orElse(ResponseEntity.notFound().build());
+        if (livreService.isbnUtiliseParUnAutreLivre(request.getIsbn(), id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Livre livre = livreService.mettreAJour(resultat.get(), LivreMapper.versEntite(request));
+        return ResponseEntity.ok(LivreMapper.versResponse(livre));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimer(@PathVariable Long id) {
-        if (!livreService.existeById(id)) {
-            return ResponseEntity.notFound().build(); // 404
+        if (!livreService.existe(id)) {
+            return ResponseEntity.notFound().build();
         }
         livreService.supprimer(id);
-        return ResponseEntity.noContent().build(); // 204
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/recherche")
+    public ResponseEntity<PagedModel<LivreResponse>> rechercher(
+            @RequestParam String titre,
+            @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
+        Page<Livre> page = livreService.rechercherParTitre(titre, pageable);
+        return ResponseEntity.ok(LivreMapper.versPage(page));
+    }
+
+    @GetMapping("/disponibles")
+    public ResponseEntity<PagedModel<LivreResponse>> listerDisponibles(
+            @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
+        Page<Livre> page = livreService.recupererDisponibles(pageable);
+        return ResponseEntity.ok(LivreMapper.versPage(page));
+    }
+
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<LivreResponse> ajouterStock(@PathVariable Long id,
+                                                      @RequestParam Integer quantite) {
+        if (quantite <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Livre> resultat = livreService.recupererParId(id);
+        if (resultat.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Livre livre = livreService.ajouterStock(resultat.get(), quantite);
+        return ResponseEntity.ok(LivreMapper.versResponse(livre));
     }
 }
-

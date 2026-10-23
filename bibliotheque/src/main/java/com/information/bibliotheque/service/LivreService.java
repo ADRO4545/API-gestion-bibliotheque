@@ -7,43 +7,53 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class LivreService {
+
     private final LivreRepository livreRepository;
     private final AuteurRepository auteurRepository;
+
     public LivreService(LivreRepository livreRepository, AuteurRepository auteurRepository) {
         this.livreRepository = livreRepository;
         this.auteurRepository = auteurRepository;
     }
 
-    public Page<Livre> findAll(Pageable pageable) {
+    public Page<Livre> recupererTous(Pageable pageable) {
         return livreRepository.findAll(pageable);
     }
 
-    public Optional<Livre> findById(Long id){
+    public Optional<Livre> recupererParId(Long id) {
         return livreRepository.findById(id);
     }
 
-    public boolean existeById(Long id){
+    public boolean existe(Long id) {
         return livreRepository.existsById(id);
     }
 
-    public boolean isbnExiste(String isbn){
-        return livreRepository.isbnExiste(isbn);
+    public boolean auteurExiste(Long auteurId) {
+        return auteurRepository.existsById(auteurId);
     }
 
-    public boolean isbnUtiliseParUnAutreLivre(String isbn, Long idLivre){
-        return livreRepository.isbnUtiliseParUnAutreLivre(isbn, idLivre);
+    public boolean isbnExiste(String isbn) {
+        return livreRepository.findByIsbn(isbn).isPresent();
     }
 
-    public Livre creer(Livre livre){
+    public boolean isbnUtiliseParUnAutreLivre(String isbn, Long idLivre) {
+        Optional<Livre> livreTrouve = livreRepository.findByIsbn(isbn);
+        if (livreTrouve.isEmpty()) {
+            return false;
+        }
+        return !livreTrouve.get().getId().equals(idLivre);
+    }
+
+    public Livre creer(Livre livre) {
+        livre.setId(null);
         return livreRepository.save(livre);
     }
 
-    public Livre mettreAJour(Livre livreExistant, Livre nouvellesValeurs){
+    public Livre mettreAJour(Livre livreExistant, Livre nouvellesValeurs) {
         livreExistant.setTitre(nouvellesValeurs.getTitre());
         livreExistant.setIsbn(nouvellesValeurs.getIsbn());
         livreExistant.setPrix(nouvellesValeurs.getPrix());
@@ -53,21 +63,20 @@ public class LivreService {
         return livreRepository.save(livreExistant);
     }
 
-    public void supprimer(Long id){
+    public void supprimer(Long id) {
         livreRepository.deleteById(id);
     }
 
     public Page<Livre> rechercherParTitre(String titre, Pageable pageable) {
-        return livreRepository.rechercherParTitre(titre, pageable);
+        return livreRepository.findByTitreContainingIgnoreCase(titre, pageable);
     }
 
-    public Page<Livre> recupererDisponibles(Pageable pageable){
-        return livreRepository.recupererDisponibles(0, pageable);
+    public Page<Livre> recupererDisponibles(Pageable pageable) {
+        return livreRepository.findByStockGreaterThan(0, pageable);
     }
 
-    public Livre ajouterStock(Livre livre, Integer quantite){
+    public Livre ajouterStock(Livre livre, Integer quantite) {
         livre.setStock(livre.getStock() + quantite);
         return livreRepository.save(livre);
     }
-
 }
