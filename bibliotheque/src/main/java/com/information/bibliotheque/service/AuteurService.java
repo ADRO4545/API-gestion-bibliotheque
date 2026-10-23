@@ -1,5 +1,6 @@
 package com.information.bibliotheque.service;
 import com.information.bibliotheque.model.Auteur;
+import com.information.bibliotheque.model.Livre;
 import com.information.bibliotheque.repository.AuteurRepository;
 import com.information.bibliotheque.repository.LivreRepository;
 import org.springframework.stereotype.Service;
@@ -30,21 +31,27 @@ public class AuteurService {
         return auteurRepository.save(auteur);
     }
 
-    public Optional<Auteur> update(Long id, Auteur auteurModifie){
-        return auteurRepository.findById(id)
-                .map(auteurExistant -> {
-                    auteurExistant.setNom(auteurModifie.getNom());
-                    auteurExistant.setPrenom(auteurModifie.getPrenom());
-                    auteurExistant.setNationalite(auteurModifie.getNationalite());
-                    return auteurRepository.save(auteurExistant);
-                });
+    public Auteur mettreAJour(Auteur auteurExistant, Auteur nouvellesValeurs){
+
+        auteurExistant.setNom(nouvellesValeurs.getNom());
+        auteurExistant.setPrenom(nouvellesValeurs.getPrenom());
+        auteurExistant.setNationalite(nouvellesValeurs.getNationalite());
+        return auteurRepository.save(auteurExistant);
     }
 
-    public boolean delete(Long id) {
-        if (auteurRepository.existsById(id)) {
-            auteurRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void delete(Long id) {
+        auteurRepository.deleteById(id);
+    }
+
+    public Page<Livre> recupererLivres(Long id, Pageable pageable){
+        return livreRepository.findByAuteurId(id, pageable);
+    }
+
+    public boolean existe(Long id){
+        return auteurRepository.existsById(id);
+    }
+
+    public boolean aDesLivres(Long id){
+        return livreRepository.existsByAuteurId(id);
     }
 }

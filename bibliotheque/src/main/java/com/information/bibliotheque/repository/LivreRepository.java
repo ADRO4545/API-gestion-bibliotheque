@@ -19,6 +19,8 @@ public interface LivreRepository extends JpaRepository<Livre, Long> {
 
     Page<Livre> findByAuteurId(Long auteurId, Pageable pageable); // les livres d'un auteur
 
+    boolean existsByAuteurId(Long auteurId); // les livres d'un auteur
+
     Page<Livre> findByTitreContainingIgnoreCase(String titre, Pageable pageable); // titre contenant le texte
 
     Page<Livre> findByStockGreaterThan(Integer stock, Pageable pageable); // stock strictement supérieur

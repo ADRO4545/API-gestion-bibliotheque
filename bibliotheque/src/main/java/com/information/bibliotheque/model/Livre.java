@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Positive;
 
 
 @Entity
-@Table(name = "livre")
+@Table(name = "Livre")
 
 public class Livre {
     @Id
