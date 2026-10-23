@@ -5,6 +5,9 @@ import com.information.bibliotheque.dto.LivreResponse;
 import com.information.bibliotheque.mapper.LivreMapper;
 import com.information.bibliotheque.model.Livre;
 import com.information.bibliotheque.service.LivreService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@Tag(name = "Livres", description = "Catalogue des livres")
 @RestController
 @RequestMapping("/api/v1/livres")
 public class LivreController {
@@ -35,6 +39,7 @@ public class LivreController {
         this.livreService = livreService;
     }
 
+    @Operation(summary = "Lister tout les livres")
     @GetMapping
     public ResponseEntity<PagedModel<LivreResponse>> listerTous(
             @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
@@ -42,6 +47,7 @@ public class LivreController {
         return ResponseEntity.ok(LivreMapper.versPage(page));
     }
 
+    @Operation(summary = "Trouver un livre par son id")
     @GetMapping("/{id}")
     public ResponseEntity<LivreResponse> obtenirParId(@PathVariable Long id) {
         Optional<Livre> resultat = livreService.recupererParId(id);
@@ -51,6 +57,7 @@ public class LivreController {
         return ResponseEntity.ok(LivreMapper.versResponse(resultat.get()));
     }
 
+    @Operation(summary = "Créer un livre")
     @PostMapping
     public ResponseEntity<LivreResponse> creer(@Valid @RequestBody LivreRequest request) {
         if (!livreService.auteurExiste(request.getAuteurId())) {
@@ -63,9 +70,10 @@ public class LivreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(LivreMapper.versResponse(livre));
     }
 
+    @Operation(summary = "Mettre à jour un livre")
     @PutMapping("/{id}")
     public ResponseEntity<LivreResponse> mettreAJour(@PathVariable Long id,
-                                                     @Valid @RequestBody LivreRequest request) {
+            @Valid @RequestBody LivreRequest request) {
         Optional<Livre> resultat = livreService.recupererParId(id);
         if (resultat.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -80,6 +88,7 @@ public class LivreController {
         return ResponseEntity.ok(LivreMapper.versResponse(livre));
     }
 
+    @Operation(summary = "Supprimer un livre")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimer(@PathVariable Long id) {
         if (!livreService.existe(id)) {
@@ -89,6 +98,7 @@ public class LivreController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Rechercher un livre par son titre")
     @GetMapping("/recherche")
     public ResponseEntity<PagedModel<LivreResponse>> rechercher(
             @RequestParam String titre,
@@ -97,6 +107,7 @@ public class LivreController {
         return ResponseEntity.ok(LivreMapper.versPage(page));
     }
 
+    @Operation(summary = "Lister les livres disponibles")
     @GetMapping("/disponibles")
     public ResponseEntity<PagedModel<LivreResponse>> listerDisponibles(
             @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
@@ -104,9 +115,10 @@ public class LivreController {
         return ResponseEntity.ok(LivreMapper.versPage(page));
     }
 
+    @Operation(summary = "Ajouter du stock à un livre")
     @PatchMapping("/{id}/stock")
     public ResponseEntity<LivreResponse> ajouterStock(@PathVariable Long id,
-                                                      @RequestParam Integer quantite) {
+            @RequestParam Integer quantite) {
         if (quantite <= 0) {
             return ResponseEntity.badRequest().build();
         }
