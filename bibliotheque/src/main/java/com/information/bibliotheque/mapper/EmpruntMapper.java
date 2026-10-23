@@ -21,7 +21,7 @@ public class EmpruntMapper {
     /**
      * Convertit une entité JPA en DTO de réponse.
      */
-    public static EmpruntResponse versResponse(EmpruntResponse emprunt) {
+    public static EmpruntResponse versResponse(Emprunt emprunt) {
         boolean enRetard = emprunt.getDateRetourPrevue().isBefore(LocalDate.now());
         return new EmpruntResponse(
                 emprunt.getId(),
@@ -30,7 +30,7 @@ public class EmpruntMapper {
                 emprunt.getDateEmprunt(),
                 emprunt.getDateRetourPrevue(),
                 emprunt.getDateRetourEffective(),
-                emprunt.getRendu(),
+                emprunt.isRendu(),
                 enRetard);
     }
 
