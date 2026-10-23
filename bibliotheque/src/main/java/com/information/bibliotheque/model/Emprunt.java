@@ -1,5 +1,6 @@
 package com.information.bibliotheque.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,10 +31,10 @@ public class Emprunt {
     @Email(message = "L'email doit être valide")
     private String emailEmprunteur;
 
-    @NotBlank(message = "La date d'emprunt est obligatoire")
+    @Column(nullable = false)
     private LocalDate dateEmprunt;
 
-    @NotBlank(message = "La date de retour est obligatoire")
+    @Column(nullable = false)
     private LocalDate dateRetourPrevue;
 
     private boolean rendu;

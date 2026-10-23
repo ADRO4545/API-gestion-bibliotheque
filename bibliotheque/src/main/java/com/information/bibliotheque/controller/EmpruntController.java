@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 @Tag(name = "Emprunts", description = "Emprunts et retours des livres")
 @RestController
-@RequestMapping("api/v1/emprunts")
+@RequestMapping("/api/v1/emprunts")
 public class EmpruntController {
 
     private final EmpruntService empruntService;
@@ -31,11 +32,10 @@ public class EmpruntController {
 
     @Operation(summary = "Liste de tout les emprunts")
     @GetMapping
-    public ResponseEntity<Page<EmpruntResponse>> listerTous(
+    public ResponseEntity<PagedModel<EmpruntResponse>> listerTous(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
-        Page<EmpruntResponse> page = empruntService.recupererTous(pageable)
-                .map(EmpruntMapper::versResponse);
-        return ResponseEntity.ok(page);
+        Page<Emprunt> page = empruntService.recupererTous(pageable);
+        return ResponseEntity.ok(EmpruntMapper.versPage(page));
     }
 
     @Operation(summary = "Trouver un emprunt par son id")
@@ -87,20 +87,18 @@ public class EmpruntController {
 
     @Operation(summary = "Voir tout les emprunts en cours")
     @GetMapping("/en-cours")
-    public ResponseEntity<Page<EmpruntResponse>> listerEnCours(
+    public ResponseEntity<PagedModel<EmpruntResponse>> listerEnCours(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
-        Page<EmpruntResponse> page = empruntService.recupererEnCours(pageable)
-                .map(EmpruntMapper::versResponse);
-        return ResponseEntity.ok(page);
+        Page<Emprunt> page = empruntService.recupererEnCours(pageable);
+        return ResponseEntity.ok(EmpruntMapper.versPage(page));
     }
 
     @Operation(summary = "Voir tout les emprunts en retard")
     @GetMapping("/en-retard")
-    public ResponseEntity<Page<EmpruntResponse>> listerEnRetard(
+    public ResponseEntity<PagedModel<EmpruntResponse>> listerEnRetard(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
-        Page<EmpruntResponse> page = empruntService.recupererEnRetard(pageable)
-                .map(EmpruntMapper::versResponse);
-        return ResponseEntity.ok(page);
+        Page<Emprunt> page = empruntService.recupererEnRetard(pageable);
+        return ResponseEntity.ok(EmpruntMapper.versPage(page));
     }
 
 }

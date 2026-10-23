@@ -10,6 +10,8 @@ import com.information.bibliotheque.model.Livre;
 import com.information.bibliotheque.service.AuteurService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -62,6 +64,11 @@ public class AuteurController {
     }
 
     @Operation(summary = "Mettre à jour un auteur")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Auteur mis à jour"),
+            @ApiResponse(responseCode = "400", description = "Données invalides (validation)"),
+            @ApiResponse(responseCode = "404", description = "Auteur inexistant")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<AuteurResponse> mettreAJour(@PathVariable Long id,
             @Valid @RequestBody AuteurRequest request) {
