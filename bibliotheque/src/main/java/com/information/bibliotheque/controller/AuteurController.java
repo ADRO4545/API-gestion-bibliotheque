@@ -99,10 +99,14 @@ public class AuteurController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimer(@PathVariable Long id) {
-        if (auteurService.delete(id)) {
-            return ResponseEntity.noContent().build();
+        if (!auteurService.existe(id)) {
+            return ResponseEntity.notFound().build(); // 404
         }
-        return ResponseEntity.notFound().build();
+        if (auteurService.aDesLivres(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409
+        }
+        auteurService.delete(id);
+        return ResponseEntity.noContent().build(); // 204
     }
 
     @Operation(summary = "Lister les livres d'un auteur")
