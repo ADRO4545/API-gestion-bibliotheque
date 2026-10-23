@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.information.bibliotheque.model.Livre;
 
 @Service
 public class EmpruntService {
@@ -41,7 +42,46 @@ public class EmpruntService {
         if (livreId == null) {
             return false;
         }
-        return livreRepository.findById(livreId).getStock() > 0;
+        return livreRepository.findById(livreId).get().getStock() > 0;
+    }
+
+    public Emprunt creer(Emprunt emprunt) {
+        emprunt.setId(null);
+        LocalDate aujourdHui = LocalDate.now();
+        emprunt.setDateEmprunt(aujourdHui);
+        emprunt.setDateRetourPrevue(aujourdHui.plusDays(DUREE_MAX_JOURS));
+        emprunt.setDateRetourEffective(null);
+        emprunt.setRendu(false);
+
+        Optional<Livre> livreOpt = livreRepository.findById(emprunt.getLivreId());
+        if (livreOpt.isPresent()) {
+            Livre livre = livreOpt.get();
+            livre.setStock(livre.getStock() - 1);
+            livreRepository.save(livre);
+        }
+        return empruntRepository.save(emprunt);
+    }
+
+    public Emprunt retourner(Emprunt emprunt) {
+        emprunt.setRendu(true);
+        emprunt.setDateRetourEffective(LocalDate.now());
+
+        Optional<Livre> livreOpt = livreRepository.findById(emprunt.getLivreId());
+        if (livreOpt.isPresent()) {
+            Livre livre = livreOpt.get();
+            livre.setStock(livre.getStock() + 1);
+            livreRepository.save(livre);
+        }
+
+        return empruntRepository.save(emprunt);
+    }
+
+    public Page<Emprunt> recupererEnCours(Pageable pageable) {
+        return empruntRepository.findByRenduFalse(pageable);
+    }
+
+    public Page<Emprunt> recupererEnRetard(Pageable pageable) {
+        return empruntRepository.findByRenduFalseAndDateRetourPrevueBefore(LocalDate.now(), pageable);
     }
 
 }

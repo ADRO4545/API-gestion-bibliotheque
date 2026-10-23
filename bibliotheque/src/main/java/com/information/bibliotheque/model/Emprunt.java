@@ -38,16 +38,19 @@ public class Emprunt {
 
     private boolean rendu;
 
+    private LocalDate dateRetourEffective;
+
     public Emprunt() {
     }
 
     public Emprunt(Long livreId, String emprunteur, String emailEmprunteur, LocalDate dateEmprunt,
-            LocalDate dateRetourPrevue, boolean rendu) {
+            LocalDate dateRetourPrevue, boolean rendu, LocalDate dateRetourEffective) {
         this.livreId = livreId;
         this.emprunteur = emprunteur;
         this.emailEmprunteur = emailEmprunteur;
         this.dateEmprunt = dateEmprunt;
         this.dateRetourPrevue = dateRetourPrevue;
+        this.dateRetourEffective = dateRetourEffective;
         this.rendu = rendu;
     }
 
@@ -105,6 +108,14 @@ public class Emprunt {
 
     public void setRendu(boolean rendu) {
         this.rendu = rendu;
+    }
+
+    public LocalDate getDateRetourEffective() {
+        return dateRetourEffective;
+    }
+
+    public void setDateRetourEffective(LocalDate dateRetourEffective) {
+        this.dateRetourEffective = dateRetourEffective;
     }
 
     @Override
