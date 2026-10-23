@@ -18,11 +18,9 @@ public class Auteur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Le nom de l'auteur est obligatoire")
     @Column(nullable = false)
     private String nom;
 
-    @NotBlank(message = "Le prénom de l'auteur est obligatoire")
     @Column(nullable = false)
     private String prenom;
 
