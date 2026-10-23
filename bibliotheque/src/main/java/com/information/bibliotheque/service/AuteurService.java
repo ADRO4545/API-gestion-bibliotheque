@@ -39,8 +39,9 @@ public class AuteurService {
         return auteurRepository.save(auteurExistant);
     }
 
-    public void delete(Long id) {
+    public boolean delete(Long id) {
         auteurRepository.deleteById(id);
+        return true;
     }
 
     public Page<Livre> recupererLivres(Long id, Pageable pageable){
