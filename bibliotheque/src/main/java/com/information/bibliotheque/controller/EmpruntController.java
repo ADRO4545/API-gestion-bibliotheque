@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Tag(name = "Emprunts", description = "Emprunts et retours des livres")
 @RestController
-@RequestMapping("/emprunts")
+@RequestMapping("api/v1/emprunts")
 public class EmpruntController {
 
     private final EmpruntService empruntService;

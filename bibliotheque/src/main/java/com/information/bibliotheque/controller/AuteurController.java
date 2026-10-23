@@ -36,10 +36,10 @@ public class AuteurController {
 
     @Operation(summary = "Méthode pour trouver tout les auteurs, sortie par page de 10 trié par le nom.")
     @GetMapping
-    public ResponseEntity<List<AuteurResponse>> findAll(@PageableDefault(size = 10, sort = "nom") Pageable pageable) {
+    public ResponseEntity<Page<AuteurResponse>> findAll(@PageableDefault(size = 10, sort = "nom") Pageable pageable) {
         Page<AuteurResponse> page = auteurService.findAll(pageable)
                 .map(AuteurMapper::versResponse);
-        return ResponseEntity.ok((List<AuteurResponse>) page);
+        return ResponseEntity.ok((Page<AuteurResponse>) page);
     }
 
     @Operation(summary = "Trouver un auteur par son id")
