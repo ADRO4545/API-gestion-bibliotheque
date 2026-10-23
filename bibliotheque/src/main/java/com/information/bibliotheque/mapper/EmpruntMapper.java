@@ -5,7 +5,7 @@ import com.information.bibliotheque.dto.EmpruntRequest;
 import com.information.bibliotheque.dto.EmpruntResponse;
 import java.time.LocalDate;
 
-public class EmpruntMapper {
+public final class EmpruntMapper {
 
     /**
      * Convertit un DTO de requête en entité JPA.

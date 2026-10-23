@@ -11,7 +11,7 @@ import org.springframework.data.web.PagedModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LivreMapper {
+public final class LivreMapper {
     /**
      * Convertit un DTO de requête en entité JPA.
      */
