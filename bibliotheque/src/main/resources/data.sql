@@ -1,5 +1,4 @@
 -- Jeu de données initial
--- Auteurs (id 1 à 5). Isaac Asimov (id 5) n'a aucun livre.
 INSERT INTO auteurs (nom, prenom, nationalite) VALUES
 ('Hugo', 'Victor', 'Française'),
 ('Rowling', 'J.K.', 'Britannique'),

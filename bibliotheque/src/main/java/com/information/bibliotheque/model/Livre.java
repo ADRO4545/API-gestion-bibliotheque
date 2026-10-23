@@ -10,10 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-
-
 @Entity
-@Table(name = "livre")
+@Table(name = "livres")
 
 public class Livre {
     @Id
@@ -40,8 +38,6 @@ public class Livre {
     @NotNull(message = "L'id de l'auteur est obligatoire")
     private Long auteurId;
 
-
-
     public Livre() {
     }
 
@@ -57,6 +53,7 @@ public class Livre {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -64,6 +61,7 @@ public class Livre {
     public String getTitre() {
         return titre;
     }
+
     public void setTitre(String titre) {
         this.titre = titre;
     }
@@ -71,6 +69,7 @@ public class Livre {
     public String getIsbn() {
         return isbn;
     }
+
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
@@ -78,6 +77,7 @@ public class Livre {
     public Double getPrix() {
         return prix;
     }
+
     public void setPrix(Double prix) {
         this.prix = prix;
     }
@@ -85,6 +85,7 @@ public class Livre {
     public Integer getAnneePublication() {
         return anneePublication;
     }
+
     public void setAnneePublication(Integer anneePublication) {
         this.anneePublication = anneePublication;
     }
@@ -92,6 +93,7 @@ public class Livre {
     public Integer getStock() {
         return stock;
     }
+
     public void setStock(Integer stock) {
         this.stock = stock;
     }
@@ -99,14 +101,13 @@ public class Livre {
     public Long getAuteurId() {
         return auteurId;
     }
+
     public void setAuteurId(Long auteurId) {
         this.auteurId = auteurId;
     }
 
-
-
     // @Override
     // public String toString() {
-        // return "Produit{id=" + id + ", nom='" + nom + "', prenom=" + prenom + "}";
+    // return "Produit{id=" + id + ", nom='" + nom + "', prenom=" + prenom + "}";
     // }
 }
