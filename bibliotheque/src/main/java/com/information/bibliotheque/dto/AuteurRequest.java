@@ -4,15 +4,15 @@ import jakarta.validation.constraints.*;
 
 public class AuteurRequest {
 
-    @NotBlank(message = "Le nom de l'auteur est obligatoire")
-    @Size(max = 100)
+    @NotBlank(message = "Le nom est obligatoire")
+    @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères ")
     private String nom;
 
-    @NotBlank(message = "Le prenom de l'auteur est obligatoire")
-    @Size(max = 100)
+    @NotBlank(message = "Le prénom de l'auteur est obligatoire")
+    @Size(max = 100, message = "Le prénom ne doit pas dépasser 100 caractères")
     private String prenom;
 
-    @Size(max = 50)
+    @Size(max = 50, message = "La nationalité ne doit pas dépasser 50 caractères")
     private String nationalite;
 
     public AuteurRequest(){}

@@ -18,7 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 
 @RestController
-@RequestMapping("/api/v1/bibliotheque")
+@RequestMapping("/api/v1/auteurs")
 public class AuteurController {
 
     private final AuteurService auteurService;
@@ -33,7 +33,7 @@ public class AuteurController {
         return ResponseEntity.ok((List<AuteurResponse>) page);
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public ResponseEntity<AuteurResponse> findById(@PathVariable Long id){
         return auteurService.findById(id)
                 .map(AuteurMapper::versResponse)
