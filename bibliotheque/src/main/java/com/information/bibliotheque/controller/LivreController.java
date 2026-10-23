@@ -7,6 +7,8 @@ import com.information.bibliotheque.model.Livre;
 import com.information.bibliotheque.service.LivreService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -15,16 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -40,6 +33,9 @@ public class LivreController {
     }
 
     @Operation(summary = "Lister tout les livres")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste des livres récupérée avec succès")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<LivreResponse>> listerTous(
             @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
@@ -48,6 +44,10 @@ public class LivreController {
     }
 
     @Operation(summary = "Trouver un livre par son id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Livre trouvé"),
+            @ApiResponse(responseCode = "404", description = "Livre inexistant")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<LivreResponse> obtenirParId(@PathVariable Long id) {
         Optional<Livre> resultat = livreService.recupererParId(id);
@@ -58,6 +58,11 @@ public class LivreController {
     }
 
     @Operation(summary = "Créer un livre")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Livre créé avec succès"),
+            @ApiResponse(responseCode = "400", description = "Erreur de validation ou Auteur inexistant"),
+            @ApiResponse(responseCode = "409", description = "ISBN déjà utilisé")
+    })
     @PostMapping
     public ResponseEntity<LivreResponse> creer(@Valid @RequestBody LivreRequest request) {
         if (!livreService.auteurExiste(request.getAuteurId())) {
@@ -71,9 +76,15 @@ public class LivreController {
     }
 
     @Operation(summary = "Mettre à jour un livre")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Livre mis à jour"),
+            @ApiResponse(responseCode = "400", description = "Erreur de validation ou Auteur inexistant"),
+            @ApiResponse(responseCode = "404", description = "Livre inexistant"),
+            @ApiResponse(responseCode = "409", description = "ISBN utilisé par un autre livre")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<LivreResponse> mettreAJour(@PathVariable Long id,
-            @Valid @RequestBody LivreRequest request) {
+                                                     @Valid @RequestBody LivreRequest request) {
         Optional<Livre> resultat = livreService.recupererParId(id);
         if (resultat.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -89,6 +100,10 @@ public class LivreController {
     }
 
     @Operation(summary = "Supprimer un livre")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Livre supprimé"),
+            @ApiResponse(responseCode = "404", description = "Livre inexistant")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimer(@PathVariable Long id) {
         if (!livreService.existe(id)) {
@@ -99,6 +114,9 @@ public class LivreController {
     }
 
     @Operation(summary = "Rechercher un livre par son titre")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste des livres correspondants récupérée")
+    })
     @GetMapping("/recherche")
     public ResponseEntity<PagedModel<LivreResponse>> rechercher(
             @RequestParam String titre,
@@ -108,6 +126,9 @@ public class LivreController {
     }
 
     @Operation(summary = "Lister les livres disponibles")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste des livres disponibles récupérée")
+    })
     @GetMapping("/disponibles")
     public ResponseEntity<PagedModel<LivreResponse>> listerDisponibles(
             @PageableDefault(size = 10, sort = "titre") Pageable pageable) {
@@ -116,9 +137,14 @@ public class LivreController {
     }
 
     @Operation(summary = "Ajouter du stock à un livre")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Stock ajouté avec succès"),
+            @ApiResponse(responseCode = "400", description = "La quantité doit être supérieure à 0"),
+            @ApiResponse(responseCode = "404", description = "Livre inexistant")
+    })
     @PatchMapping("/{id}/stock")
     public ResponseEntity<LivreResponse> ajouterStock(@PathVariable Long id,
-            @RequestParam Integer quantite) {
+                                                      @RequestParam Integer quantite) {
         if (quantite <= 0) {
             return ResponseEntity.badRequest().build();
         }
