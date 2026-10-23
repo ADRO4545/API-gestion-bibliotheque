@@ -7,6 +7,8 @@ import com.information.bibliotheque.model.Emprunt;
 import com.information.bibliotheque.service.EmpruntService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,9 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Liste de tout les emprunts")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste de tous les emprunts récupérée avec succès")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<EmpruntResponse>> listerTous(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
@@ -39,6 +44,10 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Trouver un emprunt par son id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Emprunt trouvé"),
+            @ApiResponse(responseCode = "404", description = "Emprunt inexistant")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<EmpruntResponse> obtenirParId(@PathVariable Long id) {
         return empruntService.recupererParId(id)
@@ -48,6 +57,11 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Créer un emprunt")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Emprunt créé avec succès"),
+            @ApiResponse(responseCode = "400", description = "Erreur de validation ou Livre inexistant"),
+            @ApiResponse(responseCode = "409", description = "Livre non disponible")
+    })
     @PostMapping
     public ResponseEntity<EmpruntResponse> creer(@Valid @RequestBody EmpruntRequest request) {
         // Check si livre existe (sinon 400)
@@ -67,6 +81,11 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Retourner un emprunt")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Emprunt retourné avec succès"),
+            @ApiResponse(responseCode = "404", description = "Emprunt inexistant"),
+            @ApiResponse(responseCode = "409", description = "L'emprunt a déjà été rendu")
+    })
     @PatchMapping("/{id}/retour")
     public ResponseEntity<EmpruntResponse> retourner(@PathVariable Long id) {
         Optional<Emprunt> empruntOpt = empruntService.recupererParId(id);
@@ -86,6 +105,9 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Voir tout les emprunts en cours")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste des emprunts en cours récupérée")
+    })
     @GetMapping("/en-cours")
     public ResponseEntity<PagedModel<EmpruntResponse>> listerEnCours(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
@@ -94,6 +116,9 @@ public class EmpruntController {
     }
 
     @Operation(summary = "Voir tout les emprunts en retard")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Liste des emprunts en retard récupérée")
+    })
     @GetMapping("/en-retard")
     public ResponseEntity<PagedModel<EmpruntResponse>> listerEnRetard(
             @PageableDefault(size = 10, sort = "dateEmprunt") Pageable pageable) {
