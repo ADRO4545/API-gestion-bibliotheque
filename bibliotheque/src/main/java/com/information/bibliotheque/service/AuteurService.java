@@ -1,6 +1,7 @@
 package com.information.bibliotheque.service;
 import com.information.bibliotheque.model.Auteur;
 import com.information.bibliotheque.repository.AuteurRepository;
+import com.information.bibliotheque.repository.LivreRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -11,8 +12,11 @@ import org.springframework.data.domain.Pageable;
 public class AuteurService {
 
     private final AuteurRepository auteurRepository;
-    public AuteurService(AuteurRepository auteurRepository){
+
+    private final LivreRepository livreRepository;
+    public AuteurService(AuteurRepository auteurRepository, LivreRepository livreRepository){
         this.auteurRepository = auteurRepository;
+        this.livreRepository = livreRepository;
     }
 
     public Page<Auteur> findAll(Pageable pageable) {
